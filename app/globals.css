@@ -2,26 +2,146 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+/* Huli Ko palette: deep navy, teal, sand, coral (alerts only). Values are HSL triplets. */
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 40 30% 97%;
+    --foreground: 215 50% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 50% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 50% 13%;
+    --primary: 214 58% 20%;
+    --primary-foreground: 40 30% 97%;
+    --secondary: 38 30% 92%;
+    --secondary-foreground: 215 50% 13%;
+    --muted: 38 24% 93%;
+    --muted-foreground: 215 14% 40%;
+    --accent: 38 28% 91%;
+    --accent-foreground: 215 50% 13%;
+    --destructive: 6 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 36 18% 85%;
+    --input: 36 18% 82%;
+    --ring: 175 70% 30%;
+
+    --navy: 214 58% 20%;
+    --navy-foreground: 40 30% 97%;
+    --teal: 175 72% 28%;
+    --teal-foreground: 0 0% 100%;
+    --teal-soft: 172 40% 91%;
+    --sand: 38 38% 88%;
+    --sand-foreground: 30 30% 25%;
+    --coral: 6 70% 50%;
+    --coral-foreground: 0 0% 100%;
+    --coral-soft: 8 80% 94%;
+    --warning: 32 85% 36%;
+    --warning-soft: 40 85% 91%;
+
+    --sidebar: 214 60% 15%;
+    --sidebar-foreground: 40 25% 92%;
+    --sidebar-muted: 213 20% 66%;
+    --sidebar-accent: 214 45% 21%;
+    --sidebar-border: 214 40% 22%;
+    --sidebar-active: 174 60% 52%;
+
+    --chart-1: 174 100% 27%; /* #00897B, validated as a data mark on white */
+    --chart-2: 214 58% 32%;
+    --chart-3: 32 70% 48%;
+    --chart-4: 200 55% 50%;
+    --chart-5: 38 30% 60%;
+
+    --radius: 0.375rem;
+  }
+
+  .dark {
+    --background: 215 45% 7%;
+    --foreground: 40 20% 93%;
+    --card: 215 40% 10%;
+    --card-foreground: 40 20% 93%;
+    --popover: 215 40% 10%;
+    --popover-foreground: 40 20% 93%;
+    --primary: 40 30% 92%;
+    --primary-foreground: 215 50% 13%;
+    --secondary: 215 30% 16%;
+    --secondary-foreground: 40 20% 93%;
+    --muted: 215 30% 14%;
+    --muted-foreground: 215 15% 65%;
+    --accent: 215 30% 17%;
+    --accent-foreground: 40 20% 93%;
+    --destructive: 6 75% 60%;
+    --destructive-foreground: 215 50% 10%;
+    --border: 215 28% 19%;
+    --input: 215 28% 22%;
+    --ring: 174 55% 45%;
+
+    --navy: 214 50% 30%;
+    --navy-foreground: 40 20% 93%;
+    --teal: 174 58% 45%;
+    --teal-foreground: 215 50% 8%;
+    --teal-soft: 175 40% 14%;
+    --sand: 38 20% 22%;
+    --sand-foreground: 38 35% 82%;
+    --coral: 6 78% 63%;
+    --coral-foreground: 215 50% 8%;
+    --coral-soft: 6 40% 16%;
+    --warning: 38 85% 60%;
+    --warning-soft: 36 45% 15%;
+
+    --sidebar: 216 50% 5%;
+    --sidebar-foreground: 40 20% 90%;
+    --sidebar-muted: 213 15% 60%;
+    --sidebar-accent: 215 35% 13%;
+    --sidebar-border: 215 30% 14%;
+    --sidebar-active: 174 58% 50%;
+
+    --chart-1: 174 68% 37%; /* #1E9E91, validated on the dark card surface */
+    --chart-2: 210 55% 62%;
+    --chart-3: 36 80% 58%;
+    --chart-4: 195 50% 55%;
+    --chart-5: 38 25% 60%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11";
+  }
+  /* Figures in tables and KPIs line up. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* Basemap: muted so data layers carry the color. Dark mode inverts the tiles (no separate dark tile service needed). */
+.huliko-map .leaflet-tile-pane {
+  filter: saturate(0.45) brightness(1.03);
+}
+.dark .huliko-map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) saturate(0.35) brightness(0.85) contrast(0.9);
+}
+.dark .huliko-map .leaflet-control-attribution,
+.dark .huliko-map .leaflet-bar a {
+  background: hsl(var(--card));
+  color: hsl(var(--muted-foreground));
+  border-color: hsl(var(--border));
+}
+
+/* Map tooltips follow the app theme. */
+.huliko-map .leaflet-tooltip.huliko-tooltip {
+  background: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  padding: 8px 10px;
+}
+.huliko-map .leaflet-tooltip-top.huliko-tooltip::before {
+  border-top-color: hsl(var(--border));
 }
