@@ -21,6 +21,7 @@ import { useOnboarding } from '@/hooks/useOnboarding';
 import { useRecords } from '@/hooks/useRecords';
 import { useSeaConditions } from '@/hooks/useSeaConditions';
 import { useSync } from '@/hooks/useSync';
+import { AlertsBell } from '@/components/Alerts';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useUsername } from '@/hooks/useUsername';
 import { useLocalList } from '@/storage/localList';
@@ -86,13 +87,15 @@ export default function HomeScreen() {
               </AppText>
             </View>
             <View style={styles.flex} />
+            <AlertsBell />
+            <View style={{ width: 8 }} />
             <RefreshButton spinning={refreshing} onPress={refresh} />
           </View>
 
           <Animated.View entering={FadeInDown.duration(360)} style={{ marginTop: spacing.md }}>
             <AppText variant="label" style={{ color: ink, opacity: 0.85 }}>
               {firstName ? `${greeting(t)}, ${firstName}` : greeting(t)}
-              {role ? ` · ${role.title}` : ''}
+              {role ? ` · ${t(role.title, role.titleFil)}` : ''}
             </AppText>
             <View style={styles.tempRow} accessible accessibilityLabel={`${data?.tempC == null ? 'Temperature unknown' : `${Math.round(data.tempC)} degrees`}, ${condition}`}>
               <AppText style={[styles.temp, { color: ink }]}>{data?.tempC == null ? '--' : Math.round(data.tempC)}</AppText>

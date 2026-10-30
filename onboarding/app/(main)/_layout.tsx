@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router/js-tabs';
 import { View } from 'react-native';
 
+import { AlertsWatcher } from '@/components/Alerts';
 import { FloatingAsk } from '@/components/FloatingAsk';
 import { TabBar } from '@/components/TabBar';
 import { TAB_LOOK, TAB_ROUTES, tabsFor } from '@/constants/roleNav';
@@ -40,6 +41,7 @@ export default function MainTabs() {
         ))}
       </Tabs>
       <FloatingAsk />
+      <AlertsWatcher />
     </View>
   );
 }
