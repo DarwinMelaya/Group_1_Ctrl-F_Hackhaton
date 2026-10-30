@@ -49,15 +49,15 @@ export function LoginForm({ next, initialError }: { next: string; initialError?:
     }
 
     const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
-    // Fishers and PICs who sign in here are sent to the mobile app instead.
-    if (profile?.role === "fisher" || profile?.role === "pic") {
-      window.location.assign("/app");
-      return;
-    }
     if (profile?.role !== "admin") {
       await supabase.auth.signOut();
       setPending(false);
-      setError("This account does not have admin access. Ask an administrator to grant the admin role.");
+      // Fishers and PICs use the MarAIne mobile app; this dashboard is for admins only.
+      setError(
+        profile?.role === "fisher" || profile?.role === "pic"
+          ? "This is a fisher or PIC account. Please use the MarAIne mobile app. The dashboard is for admins only."
+          : "This account does not have admin access. Ask an administrator to grant the admin role.",
+      );
       return;
     }
 

@@ -26,10 +26,7 @@
       "@/*": [
         "./*"
       ]
-    },
-    "types": [
-      "@serwist/next/typings"
-    ]
+    }
   },
   "include": [
     "next-env.d.ts",
@@ -39,6 +36,6 @@
   ],
   "exclude": [
     "node_modules",
-    "public/sw.js"
+    "onboarding"
   ]
 }

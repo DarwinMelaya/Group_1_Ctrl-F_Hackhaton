@@ -111,20 +111,21 @@ npm run dev
 ```
 Open http://localhost:3000/admin and sign in as the admin.
 
-## Mobile app (/app) for fishers and PICs
+## Mobile app for fishers and PICs (MarAIne, `onboarding/`)
 
-An installable, offline-first PWA in the same project. Tagalog first, English toggle.
+The fisher app is a separate Expo (React Native) project in `onboarding/`. It uses the same Supabase project
+with the publishable key only; RLS and triggers check every write. This web project is the admin dashboard,
+the public QR page and the SMS webhook only. Fishers and PICs who sign in at `/login` are told to use the app.
 
-- **Run with the service worker:** `npm run build && npx next start -p 3001 -H 0.0.0.0`
-  (the worker is disabled in `next dev`, so offline mode only works on a production build).
-- **Test logins (SAMPLE DATA):** `FISHER_EMAIL` / `FISHER_PASSWORD` (Ricardo Monterey, Santa Cruz) and
-  `PIC_EMAIL` / `PIC_PASSWORD` (Grace Livelo, Boac) in `.env.local`. Re-running `004_seed.sql` removes them.
-  Admins who log in at `/app/login` are sent to `/admin`; fishers and PICs who log in at `/login` are sent to `/app`.
-- **On a real phone you need HTTPS:** GPS and the service worker do not work over `http://192.168…`.
-  Quick tunnel, no account: `npx cloudflared tunnel --url http://localhost:3001`, then open the `https://…trycloudflare.com/app`
-  address on the phone. For a stable link, deploy a Vercel preview.
-- **Offline test on a laptop:** open `/app` once online (installs the worker), then Chrome DevTools > Network > Offline
-  and reload. The app opens from the phone's cache; the status chip shows "Offline".
+```powershell
+cd onboarding
+Copy-Item .env.example .env.local   # public values only: Supabase URL, publishable key, site URL
+npm install
+npx expo start --web                # or scan the QR code with Expo Go on a phone
+```
+
+- **Test logins (SAMPLE DATA):** `FISHER_EMAIL` / `FISHER_PASSWORD` and `PIC_EMAIL` / `PIC_PASSWORD` in `.env.local`
+  must exist in Supabase > Authentication. Re-running `004_seed.sql` removes them.
 - **Late entries and offline logs (migration 008):** the phone sends `recorded_at` (when it saved the log). A catch saved
   on time but synced days later is not a late entry. Device time is trusted for at most 7 days.
 

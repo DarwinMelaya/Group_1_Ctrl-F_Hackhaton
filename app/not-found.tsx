@@ -7,16 +7,14 @@ export default function NotFound() {
       <span className="flex size-14 items-center justify-center rounded-full bg-muted text-muted-foreground">
         <Compass className="size-7" aria-hidden />
       </span>
-      <h1 className="text-2xl font-semibold">Wala ang pahinang ito</h1>
-      <p className="text-base text-muted-foreground">This page does not exist. Check the address, or go back to the start.</p>
-      <div className="mt-2 grid w-full grid-cols-2 gap-3">
-        <Link href="/app" className="flex h-14 items-center justify-center rounded-xl bg-primary text-base font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal/40">
-          Huli Ko app
-        </Link>
-        <Link href="/admin" className="flex h-14 items-center justify-center rounded-xl border text-base font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal/40">
-          Dashboard
-        </Link>
-      </div>
+      <h1 className="text-2xl font-semibold">Page not found</h1>
+      <p className="text-base text-muted-foreground">This page does not exist. Check the address, or go back to the dashboard.</p>
+      <Link
+        href="/admin"
+        className="mt-2 flex h-14 w-full items-center justify-center rounded-xl bg-primary text-base font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal/40"
+      >
+        Dashboard
+      </Link>
     </main>
   );
 }
