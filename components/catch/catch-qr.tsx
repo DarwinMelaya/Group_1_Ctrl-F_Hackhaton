@@ -24,7 +24,7 @@ export function CatchQr({ token, label }: { token: string; label: string }) {
     const blob = new Blob([svg], { type: "image/svg+xml" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `huliko-qr-${token}.svg`;
+    a.download = `maraine-qr-${token}.svg`;
     a.click();
     URL.revokeObjectURL(a.href);
   }

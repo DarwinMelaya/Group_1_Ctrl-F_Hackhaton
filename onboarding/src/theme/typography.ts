@@ -1,13 +1,14 @@
 import type { TextStyle } from 'react-native';
 
-// Keys match the names registered with useFonts in app/_layout.tsx.
+// Poppins (Google Fonts) everywhere, bundled with the app so it works offline. Keys match the names
+// registered with useFonts in app/_layout.tsx.
 export const fonts = {
-  serif: 'Fraunces_600SemiBold',
-  serifItalic: 'Fraunces_400Regular_Italic',
-  sans: 'PlusJakartaSans_400Regular',
-  sansMedium: 'PlusJakartaSans_500Medium',
-  sansSemiBold: 'PlusJakartaSans_600SemiBold',
-  sansBold: 'PlusJakartaSans_700Bold',
+  display: 'Poppins_700Bold',
+  italic: 'Poppins_400Regular_Italic',
+  sans: 'Poppins_400Regular',
+  sansMedium: 'Poppins_500Medium',
+  sansSemiBold: 'Poppins_600SemiBold',
+  sansBold: 'Poppins_700Bold',
 } as const;
 
 export type TextVariant =
@@ -22,9 +23,9 @@ export type TextVariant =
   | 'eyebrow';
 
 export const typography: Record<TextVariant, TextStyle> = {
-  hero: { fontFamily: fonts.serif, fontSize: 60, lineHeight: 64, letterSpacing: -1.2 },
-  display: { fontFamily: fonts.serif, fontSize: 40, lineHeight: 46, letterSpacing: -0.6 },
-  title: { fontFamily: fonts.serif, fontSize: 30, lineHeight: 36, letterSpacing: -0.3 },
+  hero: { fontFamily: fonts.display, fontSize: 60, lineHeight: 64, letterSpacing: -1.2 },
+  display: { fontFamily: fonts.display, fontSize: 40, lineHeight: 46, letterSpacing: -0.6 },
+  title: { fontFamily: fonts.display, fontSize: 30, lineHeight: 36, letterSpacing: -0.3 },
   heading: { fontFamily: fonts.sansBold, fontSize: 19, lineHeight: 26 },
   body: { fontFamily: fonts.sans, fontSize: 17, lineHeight: 26 },
   bodyStrong: { fontFamily: fonts.sansSemiBold, fontSize: 17, lineHeight: 26 },

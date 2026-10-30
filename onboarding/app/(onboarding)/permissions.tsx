@@ -102,7 +102,7 @@ export default function PermissionsScreen() {
 
   return (
     <ScreenContainer
-      header={<StepHeader step={3} total={3} onBack={goBack} />}
+      header={<StepHeader step={4} total={4} onBack={goBack} />}
       footer={
         <>
           <Button label="Allow" loading={requesting} onPress={handleAllow} />

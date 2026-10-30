@@ -11,8 +11,10 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import type { CommunityIconName } from '@/constants/icons';
+import { hourLabel, skyOf } from '@/constants/weather';
 import type { SeaConditionsState } from '@/hooks/useSeaConditions';
 import { compassFrom, seaStateOf, type SeaState } from '@/services/seaConditions';
+import { useLanguage } from '@/hooks/useLanguage';
 import { useTheme, type Tone } from '@/theme';
 
 import { AppText } from './AppText';
@@ -110,6 +112,8 @@ export function ConditionsCard({ townName, state, refreshing, onRetry }: Conditi
 
       {info ? <AppText variant="body">{info.advice}</AppText> : null}
 
+      <SkyLine data={data} />
+
       <View style={[styles.stats, { gap: spacing.xs }]}>
         <Stat icon="waves" label="Waves" value={data.waveHeightM === null ? '–' : `${data.waveHeightM.toFixed(1)} m`} />
         <Stat
@@ -118,13 +122,51 @@ export function ConditionsCard({ townName, state, refreshing, onRetry }: Conditi
           value={data.windKmh === null ? '–' : `${Math.round(data.windKmh)} km/h${data.windFromDeg === null ? '' : ` ${compassFrom(data.windFromDeg)}`}`}
           sub={data.gustKmh === null ? undefined : `gusts ${Math.round(data.gustKmh)}`}
         />
-        <Stat icon="weather-sunset-up" label="Sunrise" value={data.sunrise ?? '–'} sub={data.sunset ? `sets ${data.sunset}` : undefined} />
+        <Stat
+          icon="weather-rainy"
+          label="Rain today"
+          value={data.rainChanceToday === null ? '–' : `${Math.round(data.rainChanceToday)}%`}
+          sub={data.rainTodayMm === null ? undefined : data.rainTodayMm < 0.1 ? 'none expected' : `about ${data.rainTodayMm.toFixed(1)} mm`}
+        />
       </View>
 
       <View style={[styles.row, { gap: 6 }]}>
         <MaterialCommunityIcons name={stale ? 'wifi-off' : 'refresh'} size={16} color={colors.textMuted} />
         <AppText variant="caption" color="textMuted" style={styles.flex}>
-          {stale ? `No signal · reading from ${timeOf(data.fetchedAt)}` : `Updated ${timeOf(data.fetchedAt)}`} · Open-Meteo
+          {stale ? `No signal · reading from ${timeOf(data.fetchedAt)}` : `Updated ${timeOf(data.fetchedAt)}`}
+          {data.sunrise ? ` · Sunrise ${data.sunrise}, sunset ${data.sunset ?? '–'}` : ''} · Forecast: Open-Meteo
+        </AppText>
+      </View>
+    </View>
+  );
+}
+
+// "Light drizzle now · 30°C" and, when rain is likely, when it starts. Icon + words, never color alone.
+function SkyLine({ data }: { data: Extract<SeaConditionsState, { status: 'ready' }>['data'] }) {
+  const { colors, spacing, radii, tones } = useTheme();
+  const { lang } = useLanguage();
+  if (data.weatherCode === undefined) return null; // a reading saved before sky data existed
+  const sky = skyOf(data.weatherCode, data.isDay);
+  const raining = sky.rainy || (data.rainNowMm ?? 0) > 0;
+
+  let outlook: string;
+  if (raining) outlook = 'Bring rain gear and keep your catch and phone dry.';
+  else if (data.rainStartsAt) outlook = `Rain likely from about ${hourLabel(data.rainStartsAt)}${data.rainChanceNext12h === null ? '' : ` (up to ${Math.round(data.rainChanceNext12h)}% chance)`}.`;
+  else if ((data.rainChanceNext12h ?? 0) >= 20) outlook = `Small chance of rain in the next 12 hours (up to ${Math.round(data.rainChanceNext12h!)}%).`;
+  else outlook = 'No rain expected in the next 12 hours.';
+
+  const wet = raining || !!data.rainStartsAt;
+  const tone = wet ? tones.sea : tones.mangrove;
+  return (
+    <View style={[styles.sky, { gap: spacing.sm, padding: spacing.sm, borderRadius: radii.sm, backgroundColor: tone.bg }]}>
+      <MaterialCommunityIcons name={sky.icon} size={28} color={tone.fg} />
+      <View style={styles.flex}>
+        <AppText variant="label" style={{ color: colors.text }}>
+          {lang === 'fil' ? (raining ? `${sky.tl} ngayon` : sky.tl) : raining ? `${sky.en} now` : sky.en}
+          {data.tempC === null ? '' : ` · ${Math.round(data.tempC)}°C`}
+        </AppText>
+        <AppText variant="caption" color="textMuted">
+          {outlook}
         </AppText>
       </View>
     </View>
@@ -188,6 +230,7 @@ const styles = StyleSheet.create({
   pill: { flexDirection: 'row', alignItems: 'center', minHeight: 32 },
   flex: { flex: 1 },
   stats: { flexDirection: 'row' },
+  sky: { flexDirection: 'row', alignItems: 'center' },
   stat: { flex: 1 },
   tabular: { fontVariant: ['tabular-nums'] },
   small: { fontSize: 13, lineHeight: 18 },

@@ -8,6 +8,7 @@ import { AppText, Button, IconBadge, ScreenContainer, StepHeader, WaveDivider } 
 import type { CommunityIconName } from '@/constants/icons';
 import { getMunicipality } from '@/constants/municipalities';
 import { getRole } from '@/constants/roles';
+import { useAuth } from '@/hooks/useAuth';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useTheme } from '@/theme';
 
@@ -21,6 +22,8 @@ export default function ReadyScreen() {
   const router = useRouter();
   const { colors, spacing, radii } = useTheme();
   const { state, complete } = useOnboarding();
+  const { auth } = useAuth();
+  const needsLogin = auth.status === 'signedOut' && state.role !== 'tourist';
   const { location = 'denied', notifications = 'denied' } = useLocalSearchParams<{
     location?: string;
     notifications?: string;
@@ -56,8 +59,10 @@ export default function ReadyScreen() {
     setSaving(true);
     setSaveFailed(false);
     try {
+      // Saved first, so the answers reach the profile when the user signs in right after.
       await complete();
-      router.replace('/home');
+      // Visitors have no Huli Ko account, and a phone that is already signed in has nothing to do here.
+      router.replace(needsLogin ? { pathname: '/login', params: { from: 'onboarding' } } : '/home');
     } catch {
       setSaving(false);
       setSaveFailed(true);
@@ -71,17 +76,17 @@ export default function ReadyScreen() {
         <>
           {saveFailed ? (
             <AppText variant="caption" color="accentText" accessibilityLiveRegion="polite">
-              We couldn't save your answers. Please try again.
+              {"We couldn't save your answers. Please try again."}
             </AppText>
           ) : null}
-          <Button label="Start exploring" trailingIcon="arrow-forward" loading={saving} onPress={handleStart} />
+          <Button label={needsLogin ? 'Continue' : 'Start exploring'} trailingIcon="arrow-forward" loading={saving} onPress={handleStart} />
         </>
       }
     >
       <Animated.View entering={FadeInDown.duration(400)} style={{ gap: spacing.md, paddingTop: spacing.lg }}>
         <IconBadge icon="check-circle-outline" tone="mangrove" size="lg" />
         <AppText variant="display" accessibilityRole="header">
-          Salamat. You're all set.
+          {"Salamat. You're all set."}
         </AppText>
         <AppText variant="body">{summary}</AppText>
         <WaveDivider color={colors.success} style={styles.wave} />

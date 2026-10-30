@@ -9,11 +9,11 @@ import { parseMapMessage, type LeafletMapHandle, type LeafletMapProps } from './
 type MapWindow = Window & { __receive?: (json: string) => void };
 
 // Web version: the same Leaflet page in a same-origin srcdoc iframe.
-export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function LeafletMap({ data, onZonePress, onError, style }, ref) {
+export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function LeafletMap({ data, onZonePress, onPlacePress, onTownPress, onError, style }, ref) {
   const frame = useRef<HTMLIFrameElement | null>(null);
   const ready = useRef(false);
-  const latest = useRef({ data, onZonePress, onError });
-  latest.current = { data, onZonePress, onError };
+  const latest = useRef({ data, onZonePress, onPlacePress, onTownPress, onError });
+  latest.current = { data, onZonePress, onPlacePress, onTownPress, onError };
 
   const post = useCallback((msg: object) => {
     if (!ready.current) return;
@@ -35,6 +35,8 @@ export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function
         ready.current = true;
         post({ type: 'data', data: latest.current.data });
       } else if (m.type === 'error') latest.current.onError?.();
+      else if (m.type === 'place') latest.current.onPlacePress?.(m.id);
+      else if (m.type === 'town') latest.current.onTownPress?.(m.id);
       else latest.current.onZonePress?.(m.id);
     };
     window.addEventListener('message', onMessage);

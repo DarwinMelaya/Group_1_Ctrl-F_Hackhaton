@@ -3,7 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_PREFIX } from '@/constants/app';
 import type { Municipality } from '@/constants/municipalities';
 
-// Live sea and wind from Open-Meteo (free, no key, CC BY 4.0: credit shown on screen).
+// Live sea, wind, sky and rain from Open-Meteo (free, no key, CC BY 4.0: credit shown on screen).
+// These are forecast-model values (Open-Meteo's best model mix for the point, refreshed every 15 minutes),
+// not readings from a station at the shore. The screens say so.
 // The last good reading is kept on the phone so Home still has something to show offline.
 
 export interface SeaConditions {
@@ -16,6 +18,22 @@ export interface SeaConditions {
   // "05:46" local time
   sunrise: string | null;
   sunset: string | null;
+  // Sky right now (WMO weather code), daylight, air temperature, and rain falling now.
+  weatherCode: number | null;
+  isDay: boolean;
+  tempC: number | null;
+  rainNowMm: number | null;
+  // Rain outlook: highest chance today, total expected today, and in the next 12 hours the first
+  // hour with a 50% or higher chance ("2026-10-30T13:00") and the highest chance.
+  rainChanceToday: number | null;
+  rainTodayMm: number | null;
+  rainStartsAt: string | null;
+  rainChanceNext12h: number | null;
+  // How it feels on the skin, and the air temperature for each of the next 12 hours (for the small chart).
+  humidity: number | null;
+  feelsLikeC: number | null;
+  dewPointC: number | null;
+  tempNext12h: number[];
   // epoch ms of when we fetched it
   fetchedAt: number;
 }
@@ -43,14 +61,22 @@ export async function fetchSeaConditions(town: Municipality): Promise<SeaConditi
   const [marine, weather] = await Promise.all([
     getJson(`https://marine-api.open-meteo.com/v1/marine?${at}&current=wave_height,wave_period`),
     getJson(
-      `https://api.open-meteo.com/v1/forecast?${at}&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
-        '&daily=sunrise,sunset&wind_speed_unit=kmh&forecast_days=1',
+      `https://api.open-meteo.com/v1/forecast?${at}&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code,is_day,temperature_2m,precipitation,relative_humidity_2m,apparent_temperature,dew_point_2m` +
+        '&hourly=precipitation_probability,temperature_2m&daily=sunrise,sunset,precipitation_probability_max,precipitation_sum&wind_speed_unit=kmh&forecast_days=2',
     ),
   ]);
 
   const m = (marine.current ?? {}) as Record<string, unknown>;
   const w = (weather.current ?? {}) as Record<string, unknown>;
   const daily = (weather.daily ?? {}) as Record<string, unknown[] | undefined>;
+  const hourly = (weather.hourly ?? {}) as Record<string, unknown[] | undefined>;
+
+  // The next 12 hours from the model's current time slot.
+  const nowSlot = typeof w.time === 'string' ? w.time.slice(0, 13) : '';
+  const times = (hourly.time ?? []) as string[];
+  const from = Math.max(0, times.findIndex((t) => t.slice(0, 13) === nowSlot));
+  const next = times.slice(from, from + 12).map((t, i) => ({ t, p: num(hourly.precipitation_probability?.[from + i]) }));
+  const chances = next.map((h) => h.p).filter((p): p is number => p !== null);
 
   const conditions: SeaConditions = {
     waveHeightM: num(m.wave_height),
@@ -60,13 +86,28 @@ export async function fetchSeaConditions(town: Municipality): Promise<SeaConditi
     windFromDeg: num(w.wind_direction_10m),
     sunrise: hhmm(daily.sunrise?.[0]),
     sunset: hhmm(daily.sunset?.[0]),
+    weatherCode: num(w.weather_code),
+    isDay: w.is_day !== 0,
+    tempC: num(w.temperature_2m),
+    rainNowMm: num(w.precipitation),
+    rainChanceToday: num(daily.precipitation_probability_max?.[0]),
+    rainTodayMm: num(daily.precipitation_sum?.[0]),
+    rainStartsAt: next.find((h) => (h.p ?? 0) >= 50)?.t ?? null,
+    rainChanceNext12h: chances.length ? Math.max(...chances) : null,
+    humidity: num(w.relative_humidity_2m),
+    feelsLikeC: num(w.apparent_temperature),
+    dewPointC: num(w.dew_point_2m),
+    tempNext12h: times
+      .slice(from, from + 12)
+      .map((_, i) => num(hourly.temperature_2m?.[from + i]))
+      .filter((v): v is number => v !== null),
     fetchedAt: Date.now(),
   };
   AsyncStorage.setItem(cacheKey(town), JSON.stringify(conditions)).catch(() => {});
   return conditions;
 }
 
-const cacheKey = (town: Municipality) => `${STORAGE_PREFIX}/sea/v1/${town.id}`;
+const cacheKey = (town: Municipality) => `${STORAGE_PREFIX}/sea/v3/${town.id}`;
 
 export async function loadCachedConditions(town: Municipality): Promise<SeaConditions | null> {
   try {

@@ -7,30 +7,30 @@ const FORMAT = { tl: "HULI <isda> <kilo>KG [haba]CM, hal. HULI TULINGAN 10KG", e
 
 export function helpReply(lang: SmsLang) {
   return lang === "tl"
-    ? `Huli Ko: Para magtala ng huli, i-text: ${FORMAT.tl}`
-    : `Huli Ko: To log a catch, text: ${FORMAT.en}`;
+    ? `MarAIne: Para magtala ng huli, i-text: ${FORMAT.tl}`
+    : `MarAIne: To log a catch, text: ${FORMAT.en}`;
 }
 
 export function errorReply(lang: SmsLang, reason: string, extra?: string) {
   const tl: Record<string, string> = {
-    no_keyword: `Huli Ko: Hindi maintindihan ang mensahe. I-text: ${FORMAT.tl}`,
-    no_species: `Huli Ko: Kulang ang pangalan ng isda. I-text: ${FORMAT.tl}`,
-    no_weight: `Huli Ko: Kulang ang timbang. I-text: ${FORMAT.tl}`,
-    unknown_species: `Huli Ko: Hindi kilala ang isdang "${extra ?? ""}". Gamitin ang lokal na pangalan, hal. TULINGAN, GALUNGGONG.`,
-    unknown_phone: "Huli Ko: Hindi rehistrado ang numerong ito. Magparehistro sa Municipal Agriculture Office (MAO).",
-    invalid_weight: "Huli Ko: Mali ang timbang. Ilagay sa kilo, hal. 10KG.",
-    invalid_size: "Huli Ko: Mali ang haba. Ilagay sa sentimetro, hal. 32CM.",
-    unavailable: "Huli Ko: Hindi maitala ngayon. Subukan muli mamaya.",
+    no_keyword: `MarAIne: Hindi maintindihan ang mensahe. I-text: ${FORMAT.tl}`,
+    no_species: `MarAIne: Kulang ang pangalan ng isda. I-text: ${FORMAT.tl}`,
+    no_weight: `MarAIne: Kulang ang timbang. I-text: ${FORMAT.tl}`,
+    unknown_species: `MarAIne: Hindi kilala ang isdang "${extra ?? ""}". Gamitin ang lokal na pangalan, hal. TULINGAN, GALUNGGONG.`,
+    unknown_phone: "MarAIne: Hindi rehistrado ang numerong ito. Magparehistro sa Municipal Agriculture Office (MAO).",
+    invalid_weight: "MarAIne: Mali ang timbang. Ilagay sa kilo, hal. 10KG.",
+    invalid_size: "MarAIne: Mali ang haba. Ilagay sa sentimetro, hal. 32CM.",
+    unavailable: "MarAIne: Hindi maitala ngayon. Subukan muli mamaya.",
   };
   const en: Record<string, string> = {
-    no_keyword: `Huli Ko: Message not understood. Text: ${FORMAT.en}`,
-    no_species: `Huli Ko: Fish name missing. Text: ${FORMAT.en}`,
-    no_weight: `Huli Ko: Weight missing. Text: ${FORMAT.en}`,
-    unknown_species: `Huli Ko: Unknown fish "${extra ?? ""}". Use the local name, e.g. TULINGAN, GALUNGGONG.`,
-    unknown_phone: "Huli Ko: This number is not registered. Please register at the Municipal Agriculture Office (MAO).",
-    invalid_weight: "Huli Ko: Invalid weight. Use kilograms, e.g. 10KG.",
-    invalid_size: "Huli Ko: Invalid length. Use centimetres, e.g. 32CM.",
-    unavailable: "Huli Ko: Could not log right now. Please try again later.",
+    no_keyword: `MarAIne: Message not understood. Text: ${FORMAT.en}`,
+    no_species: `MarAIne: Fish name missing. Text: ${FORMAT.en}`,
+    no_weight: `MarAIne: Weight missing. Text: ${FORMAT.en}`,
+    unknown_species: `MarAIne: Unknown fish "${extra ?? ""}". Use the local name, e.g. TULINGAN, GALUNGGONG.`,
+    unknown_phone: "MarAIne: This number is not registered. Please register at the Municipal Agriculture Office (MAO).",
+    invalid_weight: "MarAIne: Invalid weight. Use kilograms, e.g. 10KG.",
+    invalid_size: "MarAIne: Invalid length. Use centimetres, e.g. 32CM.",
+    unavailable: "MarAIne: Could not log right now. Please try again later.",
   };
   return (lang === "tl" ? tl : en)[reason] ?? (lang === "tl" ? tl.no_keyword : en.no_keyword);
 }

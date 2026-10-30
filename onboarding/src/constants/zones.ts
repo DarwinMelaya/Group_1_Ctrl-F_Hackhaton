@@ -25,5 +25,10 @@ export const isZoneType = (v: unknown): v is ZoneType => typeof v === 'string' &
 export const MARINDUQUE_CENTER = { lat: 13.4, lng: 121.97 };
 export const MARINDUQUE_ZOOM = 10;
 
+// [south, west] to [north, east]. ISLAND frames the island with the Tres Reyes islets and Maniwaya;
+// PAN_LIMIT adds room for its waters, and is as far as the map can be dragged or zoomed out.
+export const MARINDUQUE_ISLAND: [[number, number], [number, number]] = [[13.15, 121.72], [13.62, 122.22]];
+export const MARINDUQUE_PAN_LIMIT: [[number, number], [number, number]] = [[13.07, 121.64], [13.7, 122.3]];
+
 // Seeded zone outlines are illustrative, not official ordinances.
 export const SAMPLE_DATA = process.env.EXPO_PUBLIC_SAMPLE_DATA === 'true';

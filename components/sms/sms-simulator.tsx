@@ -68,7 +68,7 @@ export function SmsSimulator({ senders }: { senders: SenderOption[] }) {
             <MessageSquareText className="size-4" aria-hidden />
           </span>
           <div className="min-w-0 leading-tight">
-            <p className="text-sm font-semibold">Huli Ko SMS</p>
+            <p className="text-sm font-semibold">MarAIne SMS</p>
             <p className="truncate text-xs text-muted-foreground">
               From {sender ? `${sender.name} · ${from}` : `${from} (not registered)`}
             </p>

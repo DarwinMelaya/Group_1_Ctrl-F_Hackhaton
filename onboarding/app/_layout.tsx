@@ -1,13 +1,10 @@
 import {
-  Fraunces_400Regular_Italic,
-  Fraunces_600SemiBold,
-} from '@expo-google-fonts/fraunces';
-import {
-  PlusJakartaSans_400Regular,
-  PlusJakartaSans_500Medium,
-  PlusJakartaSans_600SemiBold,
-  PlusJakartaSans_700Bold,
-} from '@expo-google-fonts/plus-jakarta-sans';
+  Poppins_400Regular,
+  Poppins_400Regular_Italic,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+} from '@expo-google-fonts/poppins';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -28,12 +25,11 @@ SplashScreen.preventAutoHideAsync().catch(() => {
 export default function RootLayout() {
   // Fonts are bundled with the app, so this works offline on first launch.
   const [fontsLoaded, fontError] = useFonts({
-    Fraunces_400Regular_Italic,
-    Fraunces_600SemiBold,
-    PlusJakartaSans_400Regular,
-    PlusJakartaSans_500Medium,
-    PlusJakartaSans_600SemiBold,
-    PlusJakartaSans_700Bold,
+    Poppins_400Regular,
+    Poppins_400Regular_Italic,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
   });
 
   return (

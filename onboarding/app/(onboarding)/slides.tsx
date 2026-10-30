@@ -40,7 +40,7 @@ export default function SlidesScreen() {
     [scrollRef, width],
   );
 
-  const goToRole = () => router.push('/role');
+  const goToRole = () => router.push('/nickname');
   const handleNext = () => (index >= LAST ? goToRole() : goTo(index + 1));
 
   // Hardware back steps through slides before leaving the screen.
@@ -61,7 +61,7 @@ export default function SlidesScreen() {
       padded={false}
       header={
         <View style={[styles.topBar, { paddingLeft: spacing.xs }]}>
-          <AppText variant="heading" style={{ fontFamily: fonts.serif }}>
+          <AppText variant="heading" style={{ fontFamily: fonts.display }}>
             {APP_NAME}
           </AppText>
           <TextLink label="Skip" color="textMuted" accessibilityHint="Skips the introduction" onPress={goToRole} />

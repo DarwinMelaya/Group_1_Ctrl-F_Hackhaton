@@ -1,4 +1,4 @@
-import { MARINDUQUE_CENTER, MARINDUQUE_ZOOM } from '@/constants/zones';
+import { MARINDUQUE_CENTER, MARINDUQUE_ISLAND, MARINDUQUE_PAN_LIMIT, MARINDUQUE_ZOOM } from '@/constants/zones';
 import { colors } from '@/theme';
 
 // The map page shown inside a WebView (phone) or an iframe (web). OpenStreetMap standard tiles:
@@ -52,6 +52,13 @@ export const LEAFLET_HTML = `<!doctype html>
   .leaflet-tile-pane { filter: saturate(.5) sepia(.18) brightness(1.04) contrast(.94); }
   .leaflet-tooltip.zone { background: ${colors.white}; border: 0; border-radius: 8px; padding: 4px 8px; color: ${colors.sea900}; font-weight: 600; box-shadow: 0 1px 4px rgba(14,42,59,.25); }
   .leaflet-popup-content { margin: 10px 12px; color: ${colors.sea900}; }
+  
+  .townlabel { text-align: center; color: #0B2235; font-weight: 800; font-size: 13px; letter-spacing: .6px; line-height: 1.1; text-shadow: 0 0 3px #fff, 0 0 6px #fff; pointer-events: none; }
+  .townlabel span { display: block; font-weight: 600; font-size: 10px; letter-spacing: 0; opacity: .95; }
+  .pin { position: relative; width: 30px; height: 38px; }
+  .pin::before { content: ''; position: absolute; left: 3px; top: 0; width: 24px; height: 24px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--c); border: 3px solid #fff; box-shadow: 0 3px 6px rgba(0,0,0,.35); }
+  .pin span { position: absolute; left: 11px; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+  @media (prefers-reduced-motion: no-preference) { .leaflet-marker-icon:hover .pin { transform: translateY(-3px); transition: transform .15s ease-out; } }
   .leaflet-control-attribution { position: relative; z-index: 2; }
 
   .boat { position: relative; width: 52px; height: 40px; }
@@ -102,14 +109,33 @@ export const LEAFLET_HTML = `<!doctype html>
   var BOAT = ${JSON.stringify(BOAT_SVG)};
   var FISH = '<svg viewBox="0 0 24 24"><path d="M5 12 C8 6.5,16.5 6.5,20 11.5 C16.5 16,8 17,5 12 Z M5 12 L1.5 8.5 L2.5 12 L1.5 15.5 Z" fill="#fff"/></svg>';
 
-  var map = L.map('map', { zoomControl: false, attributionControl: true })
+  // The map stays on Marinduque: it cannot be dragged past PAN_LIMIT (viscosity 1 = a hard wall, no
+  // rubber-banding) and cannot be zoomed out beyond the zoom that shows all of PAN_LIMIT.
+  var LIMIT = L.latLngBounds(${JSON.stringify(MARINDUQUE_PAN_LIMIT)});
+  var ISLAND = L.latLngBounds(${JSON.stringify(MARINDUQUE_ISLAND)});
+  var map = L.map('map', { zoomControl: false, attributionControl: true, maxBounds: LIMIT, maxBoundsViscosity: 1.0, zoomSnap: 0.5 })
     .setView([${MARINDUQUE_CENTER.lat}, ${MARINDUQUE_CENTER.lng}], ${MARINDUQUE_ZOOM});
+  var fitted = false;
+  function layout() {
+    var s = map.getSize();
+    if (!s.x || !s.y) return; // not laid out yet; the resize event runs this again
+    var z = map.getBoundsZoom(LIMIT);
+    if (isFinite(z)) map.setMinZoom(z);
+    if (!fitted) { fitted = true; map.fitBounds(ISLAND, { animate: false }); }
+  }
+  layout();
+  map.on('resize', layout);
   L.control.zoom({ position: 'topright' }).addTo(map);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
 
+  var townLayer = L.layerGroup().addTo(map);
+  var townLabelLayer = L.layerGroup().addTo(map);
+  var placeLayer = L.layerGroup().addTo(map);
+  var townShapes = {};
+  var placeAt = {};
   var zoneLayer = L.layerGroup().addTo(map);
   var badgeLayer = L.layerGroup().addTo(map);
   var catchLayer = L.layerGroup().addTo(map);
@@ -121,6 +147,28 @@ export const LEAFLET_HTML = `<!doctype html>
 
   function render(d) {
     zoneLayer.clearLayers(); badgeLayer.clearLayers(); catchLayer.clearLayers(); meLayer.clearLayers(); shapes = {};
+    townLayer.clearLayers(); townLabelLayer.clearLayers(); placeLayer.clearLayers(); townShapes = {}; placeAt = {};
+
+    // Tourist mode: an illustrated map. No street tiles; each town filled in its own color.
+    var tourist = d.mode === 'tourist';
+    document.body.classList.toggle('tour', tourist);
+
+
+    (d.towns || []).forEach(function (t) {
+      var layer = L.geoJSON(t.geometry, { style: { color: t.color, weight: 2, opacity: 0.9, fillColor: t.color, fillOpacity: 0.35, lineJoin: 'round' } });
+      layer.on('click', function () { map.flyToBounds(layer.getBounds(), { padding: [24, 24], duration: 0.6 }); send({ type: 'town', id: t.id }); });
+      layer.addTo(townLayer);
+      townShapes[t.id] = layer;
+      var label = '<div class="townlabel"><b>' + esc(t.name.toUpperCase()) + '</b>' + (t.count ? '<span>' + t.count + (t.count === 1 ? ' place' : ' places') + '</span>' : '') + '</div>';
+      L.marker(layer.getBounds().getCenter(), { icon: L.divIcon({ className: '', html: label, iconSize: [120, 34], iconAnchor: [60, 17] }), interactive: false }).addTo(townLabelLayer);
+    });
+    (d.places || []).forEach(function (p) {
+      var pin = '<div class="pin" style="--c:' + p.color + '"><span></span></div>';
+      L.marker([p.lat, p.lng], { icon: L.divIcon({ className: '', html: pin, iconSize: [30, 38], iconAnchor: [15, 36] }), title: p.name, riseOnHover: true })
+        .on('click', function () { send({ type: 'place', id: p.id }); })
+        .addTo(placeLayer);
+      placeAt[p.id] = [p.lat, p.lng];
+    });
     (d.zones || []).forEach(function (z) {
       var layer = L.geoJSON(z.geometry, {
         style: { color: z.color, weight: 2.5, opacity: 0.9, fillColor: z.color, fillOpacity: 0.16, dashArray: z.type === 'safe' ? '6 5' : null, lineJoin: 'round' }
@@ -155,9 +203,12 @@ export const LEAFLET_HTML = `<!doctype html>
   function handle(m) {
     if (!m) return;
     if (m.type === 'data') render(m.data);
+    else if (m.type === 'focusTown' && townShapes[m.id]) map.flyToBounds(townShapes[m.id].getBounds(), { padding: [24, 24], duration: 0.6 });
+    else if (m.type === 'focusPlace' && placeAt[m.id]) map.flyTo(placeAt[m.id], Math.max(map.getZoom(), 14), { duration: 0.8 });
     else if (m.type === 'focusZone' && shapes[m.id]) map.flyToBounds(shapes[m.id].getBounds(), { padding: [32, 32], maxZoom: 15, duration: 0.6 });
-    else if (m.type === 'focusMe' && me) map.flyTo([me.lat, me.lng], Math.max(map.getZoom(), 14), { duration: 0.6 });
-    else if (m.type === 'home') map.flyTo([${MARINDUQUE_CENTER.lat}, ${MARINDUQUE_CENTER.lng}], ${MARINDUQUE_ZOOM}, { duration: 0.6 });
+    // Someone outside Marinduque (testing from home, say) stays put instead of being pushed to a corner.
+    else if (m.type === 'focusMe' && me && LIMIT.contains([me.lat, me.lng])) map.flyTo([me.lat, me.lng], Math.max(map.getZoom(), 14), { duration: 0.6 });
+    else if (m.type === 'home') map.flyToBounds(ISLAND, { duration: 0.6 });
   }
 
   window.__receive = function (json) { try { handle(JSON.parse(json)); } catch (e) {} };

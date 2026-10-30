@@ -10,17 +10,17 @@ import type { RoleId } from './roles';
 export const TAB_ROUTES = ['home', 'log', 'farm', 'report', 'places', 'map', 'catches', 'patrols', 'guide', 'more'] as const;
 export type TabRoute = (typeof TAB_ROUTES)[number];
 
-export const TAB_LOOK: Record<TabRoute, { title: string; icon: CommunityIconName }> = {
-  home: { title: 'Home', icon: 'home-variant-outline' },
-  log: { title: 'Log', icon: 'notebook-edit-outline' },
-  farm: { title: 'Farm', icon: 'sprout-outline' },
-  report: { title: 'Report', icon: 'bullhorn-outline' },
-  places: { title: 'Places', icon: 'island' },
-  map: { title: 'Map', icon: 'map-outline' },
-  catches: { title: 'Catches', icon: 'basket-outline' },
-  patrols: { title: 'Patrols', icon: 'shield-search' },
-  guide: { title: 'Guide', icon: 'book-open-variant' },
-  more: { title: 'More', icon: 'dots-horizontal' },
+export const TAB_LOOK: Record<TabRoute, { title: string; titleFil: string; icon: CommunityIconName }> = {
+  home: { title: 'Home', titleFil: 'Home', icon: 'home-variant-outline' },
+  log: { title: 'Log', titleFil: 'Itala', icon: 'notebook-edit-outline' },
+  farm: { title: 'Farm', titleFil: 'Taniman', icon: 'sprout-outline' },
+  report: { title: 'Report', titleFil: 'Ulat', icon: 'bullhorn-outline' },
+  places: { title: 'Gallery', titleFil: 'Larawan', icon: 'image-multiple-outline' },
+  map: { title: 'Map', titleFil: 'Mapa', icon: 'map-outline' },
+  catches: { title: 'Catches', titleFil: 'Huli', icon: 'basket-outline' },
+  patrols: { title: 'Patrols', titleFil: 'Bantay', icon: 'shield-search' },
+  guide: { title: 'Guide', titleFil: 'Gabay', icon: 'book-open-variant' },
+  more: { title: 'More', titleFil: 'Iba pa', icon: 'dots-horizontal' },
 };
 
 // Five tabs at most, Home first and More last. Before setup is done, the fisher layout is shown.
@@ -51,7 +51,7 @@ const A = {
   report: { key: 'report', href: '/report', icon: 'bullhorn-outline', tone: 'coral', label: 'Report', hint: 'Tell Bantay Dagat' },
   patrol: { key: 'patrol', href: '/patrols', icon: 'shield-search', tone: 'sea', label: 'Start patrol', hint: 'Log where you went and what you saw' },
   map: { key: 'map', href: '/map', icon: 'map-outline', tone: 'sea', label: 'Map', hint: 'Zones and sanctuaries' },
-  places: { key: 'places', href: '/places', icon: 'island', tone: 'reef', label: 'Places to visit', hint: 'Beaches, islands, sandbars' },
+  places: { key: 'places', href: '/places', icon: 'image-multiple-outline', tone: 'reef', label: 'Gallery', hint: 'Photos of beaches and islands' },
   guide: { key: 'guide', href: '/guide', icon: 'book-open-variant', tone: 'mangrove', label: 'Visit responsibly', hint: 'Reefs, turtles, and trash' },
 } satisfies Record<string, HomeAction>;
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Fish, MapPinned, QrCode, ShieldCheck } from "lucide-react";
+import { AppLogo } from "@/components/brand/app-logo";
 import { getCurrentProfile } from "@/lib/auth";
 import { LoginForm } from "./login-form";
 
@@ -59,10 +60,8 @@ export default async function LoginPage({
 function Brand() {
   return (
     <div className="flex items-center gap-2">
-      <span className="flex size-8 items-center justify-center rounded-md bg-teal text-teal-foreground">
-        <Fish className="size-4" aria-hidden />
-      </span>
-      <span className="text-lg font-semibold tracking-tight">Huli Ko</span>
+      <AppLogo />
+      <span className="text-lg font-semibold tracking-tight">MarAIne</span>
     </div>
   );
 }

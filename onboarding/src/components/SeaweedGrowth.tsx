@@ -10,7 +10,7 @@ export function SeaweedGrowth({ progress, width = 96 }: { progress: number; widt
     return `M${x} 52 C ${x + lean} ${52 - (h * g) / 3}, ${x - lean} ${52 - (h * g * 2) / 3}, ${x + lean / 2} ${top}`;
   };
   return (
-    <Svg width={width} height={width * 0.6} viewBox="0 0 100 60" accessible={false}>
+    <Svg width={width} height={width * 0.6} viewBox="0 0 100 60">
       <Path d="M2 54 L98 54" stroke={colors.sea700} strokeWidth={2} strokeLinecap="round" />
       <Path d="M8 54 l0 4 M50 54 l0 4 M92 54 l0 4" stroke={colors.sea700} strokeWidth={2} strokeLinecap="round" />
       {[

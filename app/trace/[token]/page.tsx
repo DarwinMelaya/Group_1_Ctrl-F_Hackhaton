@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CalendarDays, CircleCheck, ClipboardCheck, Clock, Fish, Flag, MapPin, MessageSquareText, Smartphone, TriangleAlert, UserCheck, UserRound, type LucideIcon } from "lucide-react";
+import { CalendarDays, CircleCheck, ClipboardCheck, Clock, Flag, MapPin, MessageSquareText, Smartphone, TriangleAlert, UserCheck, UserRound, type LucideIcon } from "lucide-react";
+import { AppLogo } from "@/components/brand/app-logo";
 import { createClient } from "@/lib/supabase/server";
 import { isValidTraceToken } from "@/lib/trace";
 import type { CatchSource, CatchStatus } from "@/lib/types";
@@ -45,7 +46,7 @@ const STATUS: Record<CatchStatus, { icon: LucideIcon; title: string; tl: string;
 };
 
 const SOURCE: Record<CatchSource, { icon: LucideIcon; label: string }> = {
-  app: { icon: Smartphone, label: "Logged by the fisher in the Huli Ko app" },
+  app: { icon: Smartphone, label: "Logged by the fisher in the MarAIne app" },
   sms: { icon: MessageSquareText, label: "Logged by the fisher by text message" },
   pic: { icon: UserCheck, label: "Logged by staff at the landing site" },
 };
@@ -72,11 +73,9 @@ export default async function TracePage({ params }: { params: { token: string } 
     <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
       <div className="mx-auto w-full max-w-md space-y-4">
         <header className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-md bg-teal text-teal-foreground">
-            <Fish className="size-4" aria-hidden />
-          </span>
+          <AppLogo />
           <div className="leading-tight">
-            <p className="text-sm font-semibold">Huli Ko</p>
+            <p className="text-sm font-semibold">MarAIne</p>
             <p className="text-xs text-muted-foreground">Catch trace · Marinduque</p>
           </div>
         </header>

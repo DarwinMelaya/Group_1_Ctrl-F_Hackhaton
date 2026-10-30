@@ -4,10 +4,14 @@ import { StyleSheet, View } from 'react-native';
 
 import { AppText, Button, ChoiceChip, kg, LocationRow, SavedPanel, ScreenContainer, SyncBanner, TextField, WeightStepper } from '@/components';
 import { SPECIES } from '@/constants/species';
+
 import { useLocationFix } from '@/hooks/useLocationFix';
 import { useRecords } from '@/hooks/useRecords';
 import type { CatchRecord } from '@/storage/records';
 import { useTheme } from '@/theme';
+
+// The chip for a fish that is not on the list; the name is then typed in.
+const OTHER = '__other';
 
 // How long ago it was caught. Kept to a few taps; the database allows caught_at up to now.
 const WHEN = [
@@ -29,6 +33,7 @@ export default function LogScreen() {
   const location = useLocationFix();
 
   const [species, setSpecies] = useState<string | null>(null);
+  const [otherName, setOtherName] = useState('');
   const [weight, setWeight] = useState('');
   const [size, setSize] = useState('');
   const [hoursAgo, setHoursAgo] = useState<number>(0);
@@ -37,10 +42,15 @@ export default function LogScreen() {
   const [saveFailed, setSaveFailed] = useState(false);
   const [saved, setSaved] = useState<CatchRecord | null>(null);
 
+  // A typed name that matches a listed fish (any letter case) uses the listed name, so it can sync.
+  const typed = otherName.trim().replace(/\s+/g, ' ');
+  const listed = SPECIES.find((s) => s.localName.toLowerCase() === typed.toLowerCase() || s.englishName.toLowerCase() === typed.toLowerCase());
+  const speciesName = species === OTHER ? (listed?.localName ?? typed) : species;
+
   const weightKg = parseNum(weight);
   const sizeCm = size.trim() ? parseNum(size) : null;
   const errors = {
-    species: species ? null : 'Choose what you caught.',
+    species: !species ? 'Choose what you caught.' : species === OTHER && typed.length < 2 ? 'Please type the name of the fish.' : null,
     weight: weightKg !== null && weightKg > 0 && weightKg <= 5000 ? null : 'Enter the weight, more than 0 kg.',
     size: !size.trim() || (sizeCm !== null && sizeCm > 0 && sizeCm <= 500) ? null : 'Size should be in centimeters, like 25.',
   };
@@ -48,6 +58,7 @@ export default function LogScreen() {
 
   const reset = () => {
     setSpecies(null);
+    setOtherName('');
     setWeight('');
     setSize('');
     setHoursAgo(0);
@@ -57,12 +68,12 @@ export default function LogScreen() {
 
   const save = async () => {
     setTried(true);
-    if (!valid || !species || weightKg === null) return;
+    if (!valid || !speciesName || weightKg === null) return;
     setSaving(true);
     setSaveFailed(false);
     try {
       const record = await addCatch({
-        speciesLocalName: species,
+        speciesLocalName: speciesName,
         weightKg: Math.round(weightKg * 100) / 100,
         sizeCm: sizeCm === null ? null : Math.round(sizeCm * 10) / 10,
         caughtAt: new Date(Date.now() - hoursAgo * 3600_000).toISOString(),
@@ -133,7 +144,27 @@ export default function LogScreen() {
               onPress={() => setSpecies(s.localName)}
             />
           ))}
+          <ChoiceChip tile label="Other" sublabel="Not on the list" selected={species === OTHER} onPress={() => setSpecies(OTHER)} />
         </View>
+        {species === OTHER ? (
+          <View style={{ gap: spacing.xs, marginTop: spacing.xs }}>
+            <TextField
+              label="Please specify"
+              helper={
+                listed
+                  ? `That is ${listed.localName} (${listed.englishName}) on the list. We'll save it as that.`
+                  : 'Write the local name, like Sapsap or Dilis. The MAO adds new fish to the list.'
+              }
+              placeholder="Name of the fish"
+              value={otherName}
+              onChangeText={setOtherName}
+              autoCapitalize="words"
+              autoCorrect={false}
+              autoFocus
+              maxLength={40}
+            />
+          </View>
+        ) : null}
       </Field>
 
       <Field label="How heavy?">

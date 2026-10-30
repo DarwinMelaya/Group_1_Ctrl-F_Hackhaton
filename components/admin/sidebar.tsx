@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Fish, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { AppLogo } from "@/components/brand/app-logo";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { NAV_GROUPS, isActive } from "./nav";
@@ -19,13 +20,11 @@ export function Sidebar({ collapsed = false, onToggle, onNavigate }: SidebarProp
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className={cn("flex h-14 items-center gap-2 border-b border-sidebar-border px-4", collapsed && "justify-center px-0")}>
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-teal text-teal-foreground">
-          <Fish className="size-4" aria-hidden />
-        </span>
+        <AppLogo />
         {!collapsed && (
           <div className="leading-tight">
-            <p className="text-sm font-semibold">Huli Ko</p>
-            <p className="text-xs text-sidebar-muted">Marinduque</p>
+            <p className="text-sm font-semibold">MarAIne</p>
+            <p className="text-xs text-sidebar-muted">Admin · Marinduque</p>
           </div>
         )}
       </div>

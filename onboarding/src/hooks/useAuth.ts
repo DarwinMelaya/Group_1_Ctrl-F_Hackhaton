@@ -23,10 +23,20 @@ type AuthState =
   | { status: 'signedIn'; userId: string; email: string | null; profile: Profile | null };
 
 type SignInResult = { ok: true } | { ok: false; message: string };
+// needsConfirm: the project asks new users to confirm their email before the first sign-in.
+type SignUpResult = { ok: true; needsConfirm: boolean } | { ok: false; message: string };
+
+export interface SignUpInput {
+  fullName: string;
+  email: string;
+  password: string;
+  phone: string;
+}
 
 interface AuthContextValue {
   auth: AuthState;
   signIn: (email: string, password: string) => Promise<SignInResult>;
+  signUp: (input: SignUpInput) => Promise<SignUpResult>;
   signOut: () => Promise<void>;
 }
 
@@ -151,6 +161,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [loadUser],
   );
 
+  // New accounts start as 'fisher' (handle_new_user in 009_onboarding.sql); the setup answers ride
+  // along as metadata so the profile is filled at once. Only the MAO can grant PIC or admin.
+  const signUp = useCallback(
+    async ({ fullName, email, password, phone }: SignUpInput): Promise<SignUpResult> => {
+      if (!supabase) return { ok: false, message: 'Accounts are not set up in this build.' };
+      const town = onboarding.municipality ? getMunicipality(onboarding.municipality)?.name : undefined;
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: {
+            full_name: fullName.trim(),
+            phone: phone.trim() || undefined,
+            municipality: town,
+            barangay: onboarding.barangay.trim() || undefined,
+            language: 'en',
+            ...(onboarding.role === 'fisherfolk' && { requested_role: 'fisher' }),
+          },
+        },
+      });
+      if (error) {
+        if (/already registered|already exists/i.test(error.message)) return { ok: false, message: 'This email already has an account. Sign in instead.' };
+        if (/password/i.test(error.message)) return { ok: false, message: 'Choose a stronger password: at least 8 characters.' };
+        return { ok: false, message: 'Could not create the account. Check your signal and try again.' };
+      }
+      if (!data.user) return { ok: false, message: 'Could not create the account. Try again.' };
+      if (!data.session) return { ok: true, needsConfirm: true };
+      await loadUser(data.user.id, data.user.email ?? null);
+      return { ok: true, needsConfirm: false };
+    },
+    [onboarding, loadUser],
+  );
+
   const signOut = useCallback(async () => {
     try {
       await supabase?.auth.signOut({ scope: 'local' });
@@ -161,7 +204,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuth(supabase ? { status: 'signedOut' } : { status: 'unavailable' });
   }, []);
 
-  const value = useMemo(() => ({ auth, signIn, signOut }), [auth, signIn, signOut]);
+  const value = useMemo(() => ({ auth, signIn, signUp, signOut }), [auth, signIn, signUp, signOut]);
   return createElement(AuthContext.Provider, { value }, children);
 }
 

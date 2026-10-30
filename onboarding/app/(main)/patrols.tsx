@@ -11,7 +11,7 @@ import { getMunicipality } from '@/constants/municipalities';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { newUuid } from '@/storage/records';
 import { useLocalList } from '@/storage/localList';
-import { colors as palette, useTheme, type Tone } from '@/theme';
+import { colors as palette, fonts, type Tone, useTheme } from '@/theme';
 
 const OUTCOMES = ['clear', 'checked', 'suspicious'] as const;
 type Outcome = (typeof OUTCOMES)[number];
@@ -103,7 +103,7 @@ export default function PatrolsScreen() {
         >
           <PatrolRoute />
           <View>
-            <AppText variant="caption" style={{ color: colors.selected, fontWeight: '700' }}>
+            <AppText variant="caption" style={{ color: colors.selected, fontFamily: fonts.sansBold }}>
               ON PATROL · since {timeOfDay(active.startedAt)}
             </AppText>
             <AppText variant="title" style={styles.tabular}>
@@ -176,7 +176,7 @@ export default function PatrolsScreen() {
 // A dotted patrol loop around a small island, with the banca partway along. Decorative.
 function PatrolRoute() {
   return (
-    <Svg width="100%" height={70} viewBox="0 0 320 70" preserveAspectRatio="xMidYMid meet" accessible={false}>
+    <Svg width="100%" height={70} viewBox="0 0 320 70" preserveAspectRatio="xMidYMid meet">
       <Path d="M0 60 L320 60" stroke={palette.reef300} strokeWidth={2} />
       <Path d="M130 52 C 140 30, 175 26, 190 52 Z" fill={palette.mangrove600} />
       <Path d="M150 34 l 2 -10 m 4 12 l 3 -9" stroke={palette.mangrove700} strokeWidth={2} strokeLinecap="round" />

@@ -16,7 +16,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Huli Ko", template: "%s · Huli Ko" },
+  title: { default: "MarAIne", template: "%s · MarAIne" },
   description: "Fisheries traceability and coastal resource management for Marinduque.",
 };
 

@@ -10,13 +10,21 @@ import { LeafletMap } from '@/components/map/LeafletMap';
 import type { LeafletMapHandle, MapData } from '@/components/map/types';
 import type { CommunityIconName } from '@/constants/icons';
 import { SAMPLE_DATA, ZONE_LOOK, ZONE_TYPES } from '@/constants/zones';
+import { TouristMap } from '@/components/TouristMap';
 import { useLocationFix } from '@/hooks/useLocationFix';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import { useRecords } from '@/hooks/useRecords';
 import { useZones } from '@/hooks/useZones';
 import { zonesAt, type Zone } from '@/services/zones';
-import { useTheme } from '@/theme';
+import { fonts, useTheme } from '@/theme';
 
+// Tourists get the illustrated Discover map; everyone else gets zones and the zone check.
 export default function MapScreen() {
+  const { state } = useOnboarding();
+  return state.role === 'tourist' ? <TouristMap /> : <ZonesMap />;
+}
+
+function ZonesMap() {
   const router = useRouter();
   const { colors, spacing, radii } = useTheme();
   const mapRef = useRef<LeafletMapHandle>(null);
@@ -231,7 +239,7 @@ function HereCard({ here, locating, denied, onLocate }: { here: Zone[] | null; l
     <Animated.View entering={FadeIn.duration(200)} style={[...box, { borderColor: look.color, borderWidth: 2 }]} accessibilityLiveRegion="polite">
       <MaterialCommunityIcons name={look.icon} size={30} color={look.color} />
       <View style={styles.flex}>
-        <AppText variant="caption" style={{ color: look.color, fontWeight: '700' }}>
+        <AppText variant="caption" style={{ color: look.color, fontFamily: fonts.sansBold }}>
           You are inside · {look.label}
         </AppText>
         <AppText variant="heading">{top.name}</AppText>
@@ -253,7 +261,7 @@ function ZoneDetail({ zone, onClose }: { zone: Zone; onClose: () => void }) {
     >
       <View style={[styles.hereRow, { gap: spacing.xs }]}>
         <MaterialCommunityIcons name={look.icon} size={20} color={look.color} />
-        <AppText variant="caption" style={[styles.flex, { color: look.color, fontWeight: '700' }]}>
+        <AppText variant="caption" style={[styles.flex, { color: look.color, fontFamily: fonts.sansBold }]}>
           {look.label}
         </AppText>
         <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Close" hitSlop={12}>

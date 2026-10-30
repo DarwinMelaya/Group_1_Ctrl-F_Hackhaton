@@ -13,7 +13,9 @@ export default function OnboardingLayout() {
       }}
     >
       <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
+      <Stack.Screen name="language" />
       <Stack.Screen name="slides" />
+      <Stack.Screen name="nickname" />
       <Stack.Screen name="role" />
       <Stack.Screen name="location" />
       <Stack.Screen name="permissions" />

@@ -43,7 +43,8 @@ async function speciesId(localName: string): Promise<string> {
     speciesIds = new Map((data ?? []).map((s: { id: string; local_name: string }) => [s.local_name, s.id]));
   }
   const id = speciesIds.get(localName);
-  if (!id) throw new Error(`${localName} is not in the species list on the server.`);
+  // Shown as: "The server did not accept this catch: <this>. Please show it to the MAO."
+  if (!id) throw new Error(`${localName} is not on the MAO's fish list yet, so the MAO needs to add it first`);
   return id;
 }
 

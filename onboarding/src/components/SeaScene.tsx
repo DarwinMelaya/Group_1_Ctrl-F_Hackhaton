@@ -107,7 +107,7 @@ export function SeaScene({ waveHeightM, height = 196 }: SeaSceneProps) {
   );
 }
 
-function WaveBand({
+export function WaveBand({
   width,
   bottom,
   amp,
@@ -149,13 +149,20 @@ function WaveBand({
   );
 }
 
-function Boat({ sceneWidth, bottom, waveHeightM, reduce }: { sceneWidth: number; bottom: number; waveHeightM: number; reduce: boolean }) {
+export function Boat({ sceneWidth, bottom, waveHeightM, reduce }: { sceneWidth: number; bottom: number; waveHeightM: number; reduce: boolean }) {
   const bob = useSharedValue(0);
   const tapY = useSharedValue(0);
   const tapR = useSharedValue(0);
   const boatWidth = clamp(sceneWidth * 0.42, 130, 200);
-  const lift = clamp(2 + waveHeightM * 4, 2, 12);
-  const tilt = clamp(1.5 + waveHeightM * 3, 1.5, 9);
+  // How high and how far the boat rocks. Eased on the UI thread when the sea changes, so a switch from
+  // calm to windy grows the motion instead of snapping to it.
+  const lift = useSharedValue(clamp(2 + waveHeightM * 4, 2, 12));
+  const tilt = useSharedValue(clamp(1.5 + waveHeightM * 3, 1.5, 9));
+
+  useEffect(() => {
+    lift.value = withTiming(clamp(2 + waveHeightM * 4, 2, 12), { duration: 900, easing: Easing.inOut(Easing.quad) });
+    tilt.value = withTiming(clamp(1.5 + waveHeightM * 3, 1.5, 9), { duration: 900, easing: Easing.inOut(Easing.quad) });
+  }, [waveHeightM, lift, tilt]);
 
   useEffect(() => {
     if (reduce) return;
@@ -165,8 +172,8 @@ function Boat({ sceneWidth, bottom, waveHeightM, reduce }: { sceneWidth: number;
 
   const style = useAnimatedStyle(() => ({
     transform: [
-      { translateY: -bob.value * lift + tapY.value },
-      { rotate: `${(bob.value - 0.5) * 2 * tilt + tapR.value}deg` },
+      { translateY: -bob.value * lift.value + tapY.value },
+      { rotate: `${(bob.value - 0.5) * 2 * tilt.value + tapR.value}deg` },
     ],
   }));
 
@@ -199,7 +206,7 @@ function Boat({ sceneWidth, bottom, waveHeightM, reduce }: { sceneWidth: number;
 }
 
 // Tap the water and a fish arcs out of it at that spot.
-function JumpingFishLayer({ width, height, reduce }: { width: number; height: number; reduce: boolean }) {
+export function JumpingFishLayer({ width, height, reduce }: { width: number; height: number; reduce: boolean }) {
   const [x, setX] = useState(width * 0.7);
   const t = useSharedValue(0);
 

@@ -1,0 +1,16 @@
+import { cn } from "@/lib/utils";
+
+// The MarAIne mark, the same drawing as the mobile app icon: a banca under the sun on two waves.
+export function AppLogo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" className={cn("size-8 shrink-0", className)} role="img" aria-label="MarAIne">
+      <rect width="100" height="100" rx="24" fill="#0E2A3B" />
+      <circle cx="66" cy="34" r="14" fill="#F0A07F" />
+      <path d="M44 22 L44 62" stroke="#FAF6EE" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M47 25 L47 58 L68 56 Z" fill="#FAF6EE" />
+      <path d="M24 62 C 38 70, 60 70, 76 61 C 72 68, 62 72, 50 72 C 38 72, 28 68, 24 62 Z" fill="#FAF6EE" />
+      <path d="M12 80 C 22 74, 30 74, 40 80 S 58 86, 68 80 S 82 74, 88 78" stroke="#7CC2BA" strokeWidth="4" strokeLinecap="round" fill="none" />
+      <path d="M22 89 C 30 85, 38 85, 46 89 S 62 93, 72 88" stroke="#1F8A84" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+}

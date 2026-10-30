@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
+import { useLanguage } from '@/hooks/useLanguage';
+import { toFil } from '@/i18n/fil';
 import { useTheme } from '@/theme';
 
 import { AppText } from './AppText';
@@ -10,7 +12,8 @@ interface TextFieldProps extends Omit<TextInputProps, 'style' | 'placeholderText
   helper?: string;
 }
 
-export function TextField({ label, helper, onFocus, onBlur, ...inputProps }: TextFieldProps) {
+export function TextField({ label, helper, onFocus, onBlur, placeholder, ...inputProps }: TextFieldProps) {
+  const { lang } = useLanguage();
   const { colors, radii, spacing, typography } = useTheme();
   const [focused, setFocused] = useState(false);
 
@@ -20,6 +23,7 @@ export function TextField({ label, helper, onFocus, onBlur, ...inputProps }: Tex
       <TextInput
         accessibilityLabel={label}
         accessibilityHint={helper}
+        placeholder={placeholder && lang === 'fil' ? toFil(placeholder) : placeholder}
         placeholderTextColor={colors.textMuted}
         onFocus={(e) => {
           setFocused(true);

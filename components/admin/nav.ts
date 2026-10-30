@@ -9,6 +9,7 @@ import {
   Siren,
   Sparkles,
   Users,
+  Waves,
   type LucideIcon,
 } from "lucide-react";
 
@@ -33,6 +34,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/admin/zones", label: "Zones", icon: Map },
       { href: "/admin/fishers", label: "Fishers", icon: Users },
       { href: "/admin/gallery", label: "Gallery", icon: Images },
+      { href: "/admin/sites", label: "Visitor sites", icon: Waves },
     ],
   },
   {

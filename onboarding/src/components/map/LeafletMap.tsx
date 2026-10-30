@@ -28,7 +28,7 @@ const WebView = RNWebView as unknown as ComponentType<{
 }>;
 
 // Phone version: Leaflet inside a WebView. The web build uses LeafletMap.web.tsx.
-export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function LeafletMap({ data, onZonePress, onError, style }, ref) {
+export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function LeafletMap({ data, onZonePress, onPlacePress, onTownPress, onError, style }, ref) {
   const web = useRef<WebViewHandle>(null);
   const ready = useRef(false);
 
@@ -50,6 +50,8 @@ export const LeafletMap = forwardRef<LeafletMapHandle, LeafletMapProps>(function
       ready.current = true;
       post({ type: 'data', data });
     } else if (m.type === 'error') onError?.();
+    else if (m.type === 'place') onPlacePress?.(m.id);
+    else if (m.type === 'town') onTownPress?.(m.id);
     else onZonePress?.(m.id);
   };
 

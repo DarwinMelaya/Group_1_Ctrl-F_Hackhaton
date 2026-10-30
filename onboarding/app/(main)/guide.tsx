@@ -5,55 +5,8 @@ import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, w
 import Svg, { Circle, Ellipse, Path } from 'react-native-svg';
 
 import { AppText, ScreenContainer } from '@/components';
-import type { CommunityIconName } from '@/constants/icons';
-import { colors as palette, useTheme, type Tone } from '@/theme';
-
-interface Section {
-  title: string;
-  icon: CommunityIconName;
-  tone: Tone;
-  do: string[];
-  dont: string[];
-}
-
-// General good practice for visitors and coastal residents. No laws are quoted by number on purpose.
-const SECTIONS: Section[] = [
-  {
-    title: 'Coral reefs',
-    icon: 'flower-poppy',
-    tone: 'reef',
-    do: ['Float over the reef and keep your fins up.', 'Ask your boatman to tie up to a buoy, not drop anchor on coral.'],
-    dont: ['Stand on, touch, or break coral.', 'Take coral, shells, or starfish home.'],
-  },
-  {
-    title: 'Sea turtles (pawikan)',
-    icon: 'turtle',
-    tone: 'mangrove',
-    do: ['Watch from a few meters away and let them swim off.', 'Keep away from nests on the beach, especially at night.'],
-    dont: ['Touch, ride, chase, or feed them.', 'Buy anything made from turtles or their shells. They are protected by law.'],
-  },
-  {
-    title: 'Marine sanctuaries',
-    icon: 'shield-half-full',
-    tone: 'sea',
-    do: ['Follow the barangay rules posted at the sanctuary.', 'Check the Map tab to see where the sanctuaries are.'],
-    dont: ['Fish, collect, or spearfish inside a sanctuary.'],
-  },
-  {
-    title: 'Trash and plastic',
-    icon: 'recycle',
-    tone: 'mangrove',
-    do: ['Bring back everything you brought, including small wrappers.', 'Use a refillable water bottle.'],
-    dont: ['Leave trash on islands or sandbars; the tide carries it out to sea.'],
-  },
-  {
-    title: 'Safety on a banca',
-    icon: 'lifebuoy',
-    tone: 'coral',
-    do: ['Wear a life vest for the whole trip.', "Check today's sea on the Home tab before you go."],
-    dont: ['Go out when the sea is rough, even if someone offers.'],
-  },
-];
+import { GUIDE_SECTIONS } from '@/constants/guide';
+import { colors as palette, useTheme } from '@/theme';
 
 export default function GuideScreen() {
   const { colors, spacing, radii, tones } = useTheme();
@@ -64,14 +17,14 @@ export default function GuideScreen() {
           Visit responsibly
         </AppText>
         <AppText variant="body" color="textMuted">
-          A few habits that keep Marinduque's reefs, turtles and beaches alive for the next visitor.
+          {"A few habits that keep Marinduque's reefs, turtles and beaches alive for the next visitor."}
         </AppText>
       </View>
 
       <TurtleScene />
 
       <View style={{ gap: spacing.md, marginTop: spacing.md }}>
-        {SECTIONS.map((s) => (
+        {GUIDE_SECTIONS.map((s) => (
           <View key={s.title} style={[styles.card, { borderRadius: radii.lg, borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.md, gap: spacing.sm }]}>
             <View style={[styles.row, { gap: spacing.sm }]}>
               <View style={[styles.badge, { backgroundColor: tones[s.tone].bg, borderRadius: radii.sm }]}>

@@ -60,7 +60,7 @@ export function CatchRow({ record }: { record: CatchRecord }) {
         </AppText>
         <View style={[styles.meta, { gap: 6 }]}>
           <AppText variant="caption" color="textMuted">
-            {species?.englishName ?? 'Fish'} · {timeOfDay(record.caughtAt)}
+            {species?.englishName ?? 'Other fish'} · {timeOfDay(record.caughtAt)}
           </AppText>
           <MaterialCommunityIcons
             name={record.location ? 'map-marker-check-outline' : 'map-marker-off-outline'}

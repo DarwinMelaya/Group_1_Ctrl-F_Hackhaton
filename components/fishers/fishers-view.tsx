@@ -188,7 +188,7 @@ export function FishersView({ rows, today, activityDays }: { rows: FisherRow[]; 
         r.flagged,
       ]),
     );
-    downloadCsv(`huliko-fishers-${today}.csv`, csv);
+    downloadCsv(`maraine-fishers-${today}.csv`, csv);
     toast.success(`Exported ${sorted.length} ${sorted.length === 1 ? "fisher" : "fishers"} to CSV`);
   }
 

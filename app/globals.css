@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Huli Ko palette: deep navy, teal, sand, coral (alerts only). Values are HSL triplets. */
+/* MarAIne palette: deep navy, teal, sand, coral (alerts only). Values are HSL triplets. */
 @layer base {
   :root {
     --background: 40 30% 97%;

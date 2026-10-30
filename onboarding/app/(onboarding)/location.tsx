@@ -14,7 +14,7 @@ export default function LocationScreen() {
 
   return (
     <ScreenContainer
-      header={<StepHeader step={2} total={3} />}
+      header={<StepHeader step={3} total={4} />}
       footer={
         <Button
           label="Continue"
